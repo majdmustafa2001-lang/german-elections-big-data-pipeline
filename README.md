@@ -13,11 +13,11 @@ Ziel ist der Aufbau einer vollständigen Data-Engineering-Pipeline, die offiziel
 - Azure Data Factory
 - Azure Data Lake Storage Gen2
 - Apache Spark / PySpark
-- Google Cloud Dataproc
+- Google Cloud Dataproc / Azure Databricks 
 - Apache Airflow
 - SQL / Azure MySQL
 - Tableau
-
+- 
 ## Datenquellen
 
 Das Projekt verwendet mehrere Datenquellen:
@@ -110,50 +110,7 @@ Die Pipeline ist aktuell auf einen 30-Minuten-Zeitplan ausgelegt.
 
 ## Architektur
 
-Official Election Data
-        |
-        v
-Azure Data Factory
-        |
-        v
-Azure Data Lake Storage
-Bronze
-        |
-        v
-PySpark / Dataproc
-        |
-        v
-Silver
-        |
-        v
-Gold
-        |
-        v
-Azure MySQL
-        |
-        v
-Power BI / Tableau
-        |
-        |
-YouTube Data API
-        |
-        v
-Apache Airflow
-        |
-        v
-ADLS Bronze
-        |
-        v
-Google Cloud Dataproc / PySpark
-        |
-        v
-ADLS Silver
-        |
-        v
-ADLS Gold
-        |
-        v
-Azure MySQL
+![Architektur](docs/Diagramm_final.png)
 
 ## Ergebnis
 
@@ -173,17 +130,25 @@ Während des Projekts wurden unter anderem folgende Herausforderungen behandelt:
 
 - unterschiedliche Schemas deutscher Wahldaten
 - CSV-Dateien mit unterschiedlichen Header-Positionen
-- Wide-to-Long-Transformationen
 - YouTube-API-Pagination
 - API-Quota-Limits
 - inkrementelle Datenaufnahme
-- Deduplizierung nach `video_id`
+- Deduplizierung nach (video_id)
 - OAuth-Zugriff von Dataproc auf Azure Data Lake Storage
 - Cross-Cloud-Kommunikation zwischen GCP und Azure
 - Cloud NAT und MySQL-Firewall-Regeln
-- Data-Quality-Prüfungen
 - Spark-Performance und Vermeidung unnötiger Actions
-- 
+- Bei einer Wahldatenquelle trat nach der Konvertierung von Excel nach CSV eine
+  Spaltenverschiebung auf. Dadurch wurden einzelne Werte nicht mehr den ursprünglich
+  vorgesehenen Spalten zugeordnet.
+  ![Spaltenverschiebung in den Rohdaten](docs/screenshots/schema_shift_raw.png)
+
+  Das Problem wurde durch gezielte Plausibilitätsprüfungen auf Ebene einzelner
+  Wahlkreise und Wahlbezirke erkannt. Anschließend wurden die betroffenen Spalten
+  analysiert und die relevanten Werte wieder einem standardisierten Schema
+  zugeordnet.
+  ![Korrigiertes standardisiertes Schema](docs/screenshots/schema_shift_fixed.png)
+  
 ## Designentscheidungen
 
 Im Verlauf des Projekts wurde die Architektur mehrfach angepasst, um eine stabile und nachvollziehbare Verarbeitung der Daten zu gewährleisten.
@@ -203,3 +168,8 @@ Die grundlegende Architektur blieb dadurch erhalten:
 - Tableau für Analyse und Visualisierung
 
 Für den aktuellen Portfolio-Datenumfang werden einzelne Silver- und Gold-Datasets bei der Verarbeitung vollständig neu geschrieben. Diese Lösung wurde bewusst gewählt, da sie für den vorhandenen Datenumfang einfach, transparent und ausreichend stabil ist.
+
+## Tableau Dashboard
+
+Die aufbereiteten Daten werden in Tableau Public visualisiert.
+ [Interaktive Tableau-Galerie öffnen](https://public.tableau.com/app/profile/majd.mustafa/vizzes)
